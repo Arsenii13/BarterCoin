@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Assistant</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌦️ Weather Assistant</h1>
+
+    <form method="POST">
+
+        <input
+            type="text"
+            name="city"
+            placeholder="Enter city"
+            required
+            value="{{ city }}"
+        >
+
+        <select name="mode">
+
+            <option value="now">Current</option>
+            <option value="hourly">By Hours</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="week">7 Days</option>
+
+        </select>
+
+        <button type="submit">
+            Get Weather
+        </button>
+
+    </form>
+
+
+    {% if result %}
+
+        <div class="result">
+
+            {% for line in result %}
+{{ line }}<br>
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if graph_data %}
+
+        <div class="graph" id="graph"></div>
+
+        <script>
+
+            var data = [
+                {
+                    x: {{ graph_data.dates | safe }},
+                    y: {{ graph_data.max | safe }},
+                    type: "scatter",
+                    name: "Max Temp"
+                },
+                {
+                    x: {{ graph_data.dates | safe }},
+                    y: {{ graph_data.min | safe }},
+                    type: "scatter",
+                    name: "Min Temp"
+                }
+            ];
+
+            Plotly.newPlot("graph", data);
+
+        </script>
+
+    {% endif %}
+
+
+</div>
+
+</body>
+</html>
