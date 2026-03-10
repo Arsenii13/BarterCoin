@@ -1,86 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Weather Assistant</title>
+<meta charset="UTF-8">
+<title>BarterCoin Demo</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script type="module" src="app.js"></script>
 
-    <!-- Plotly -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<style>
+body{
+font-family:Arial;
+max-width:700px;
+margin:auto;
+padding:20px;
+}
+
+button{
+padding:10px;
+margin:5px;
+}
+
+.card{
+border:1px solid #ccc;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+}
+</style>
+
 </head>
 
 <body>
 
-<div class="container">
+<h1>BarterCoin Demo</h1>
 
-    <h1>🌦️ Weather Assistant</h1>
+<div id="loginArea">
+<button id="googleLogin">Login with Google</button>
+</div>
 
-    <form method="POST">
+<div id="appArea" style="display:none">
 
-        <input
-            type="text"
-            name="city"
-            placeholder="Enter city"
-            required
-            value="{{ city }}"
-        >
+<h3>User</h3>
+<p id="username"></p>
+<p>Balance: <span id="balance"></span> BC</p>
 
-        <select name="mode">
+<hr>
 
-            <option value="now">Current</option>
-            <option value="hourly">By Hours</option>
-            <option value="tomorrow">Tomorrow</option>
-            <option value="week">7 Days</option>
+<h3>Send Coins</h3>
 
-        </select>
+<input id="targetUID" placeholder="Receiver UID">
+<input id="amount" placeholder="Amount">
+<button id="sendCoins">Send</button>
 
-        <button type="submit">
-            Get Weather
-        </button>
+<hr>
 
-    </form>
+<h3>Marketplace</h3>
 
+<input id="itemName" placeholder="Item name">
+<input id="price" placeholder="Price">
+<button id="createListing">Sell Item</button>
 
-    {% if result %}
-
-        <div class="result">
-
-            {% for line in result %}
-{{ line }}<br>
-            {% endfor %}
-
-        </div>
-
-    {% endif %}
-
-
-    {% if graph_data %}
-
-        <div class="graph" id="graph"></div>
-
-        <script>
-
-            var data = [
-                {
-                    x: {{ graph_data.dates | safe }},
-                    y: {{ graph_data.max | safe }},
-                    type: "scatter",
-                    name: "Max Temp"
-                },
-                {
-                    x: {{ graph_data.dates | safe }},
-                    y: {{ graph_data.min | safe }},
-                    type: "scatter",
-                    name: "Min Temp"
-                }
-            ];
-
-            Plotly.newPlot("graph", data);
-
-        </script>
-
-    {% endif %}
-
+<div id="marketplace"></div>
 
 </div>
 
