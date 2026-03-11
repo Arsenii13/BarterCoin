@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta  charset="UTF-8">
-<title>BarterCoin Demo</title>
-
+<meta charset="UTF-8">
+<title>BarterCoin</title>
 <script type="module" src="app.js"></script>
 
 <style>
+
 body{
 font-family:Arial;
 max-width:700px;
@@ -15,7 +15,12 @@ padding:20px;
 }
 
 button{
-padding:10px;
+padding:8px;
+margin:5px;
+}
+
+input,select{
+padding:6px;
 margin:5px;
 }
 
@@ -25,13 +30,14 @@ padding:10px;
 margin-top:10px;
 border-radius:8px;
 }
+
 </style>
 
 </head>
 
 <body>
 
-<h1>BarterCoin Demo</h1>
+<h1>BarterCoin</h1>
 
 <div id="loginArea">
 <button id="googleLogin">Login with Google</button>
@@ -39,25 +45,31 @@ border-radius:8px;
 
 <div id="appArea" style="display:none">
 
-<h3>User</h3>
-<p id="username"></p>
-<p>Balance: <span id="balance"></span> BC</p>
+<h3 id="username"></h3>
+Balance: <b><span id="balance"></span> BC</b>
 
 <hr>
 
 <h3>Send Coins</h3>
 
-<input id="targetUID" placeholder="Receiver UID">
-<input id="amount" placeholder="Amount">
+<select id="userDropdown"></select>
+
+<input id="amount" type="number" placeholder="Amount">
+
 <button id="sendCoins">Send</button>
 
 <hr>
 
-<h3>Marketplace</h3>
+<h3>Create Listing</h3>
 
 <input id="itemName" placeholder="Item name">
-<input id="price" placeholder="Price">
-<button id="createListing">Sell Item</button>
+<input id="price" type="number" placeholder="Price">
+
+<button id="createListing">Sell</button>
+
+<hr>
+
+<h3>Marketplace</h3>
 
 <div id="marketplace"></div>
 
@@ -65,4 +77,3 @@ border-radius:8px;
 
 </body>
 </html>
-
