@@ -1,16 +1,16 @@
 body{
 font-family:Arial;
 margin:0;
-background:#f4f6f8;
+background:#eef2f5;
 }
 
 .navbar{
 display:flex;
 justify-content:space-between;
 align-items:center;
-background:#1f2937;
-padding:10px 20px;
+background:#111827;
 color:white;
+padding:12px 20px;
 }
 
 .logo{
@@ -18,38 +18,46 @@ font-size:20px;
 font-weight:bold;
 }
 
-.nav-links{
-list-style:none;
-display:flex;
-gap:10px;
-padding:0;
-margin:0;
-}
-
-.nav-links button{
-background:#374151;
+.nav-buttons button{
+margin-left:8px;
+padding:8px 14px;
 border:none;
+background:#374151;
 color:white;
-padding:8px 12px;
-cursor:pointer;
 border-radius:6px;
+cursor:pointer;
 }
 
-.nav-links button:hover{
+.nav-buttons button:hover{
 background:#4b5563;
 }
 
 .container{
-padding:20px;
 max-width:800px;
 margin:auto;
+padding:20px;
 }
 
 .page{
 display:none;
 }
 
-input, textarea, select{
+.walletBox{
+background:white;
+padding:15px;
+border-radius:8px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+font-size:20px;
+}
+
+.postBox{
+background:white;
+padding:15px;
+border-radius:8px;
+margin-bottom:20px;
+}
+
+input,textarea,select{
 width:100%;
 padding:8px;
 margin:6px 0;
@@ -58,11 +66,11 @@ box-sizing:border-box;
 
 button{
 padding:8px 12px;
-cursor:pointer;
-border:none;
 background:#2563eb;
+border:none;
 color:white;
 border-radius:6px;
+cursor:pointer;
 }
 
 button:hover{
@@ -71,16 +79,17 @@ background:#1e40af;
 
 .offer{
 background:white;
-padding:10px;
-margin:10px 0;
-border-radius:6px;
-box-shadow:0 2px 4px rgba(0,0,0,0.1);
+padding:12px;
+border-radius:8px;
+margin-bottom:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
 @media(max-width:600px){
 
-.nav-links{
-flex-wrap:wrap;
+.navbar{
+flex-direction:column;
+gap:10px;
 }
 
 }

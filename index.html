@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BarterCoin</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -10,14 +10,16 @@
 <body>
 
 <nav class="navbar">
-  <div class="logo">BarterCoin</div>
 
-  <ul class="nav-links">
-    <li><button id="navWallet">Wallet</button></li>
-    <li><button id="navMarket">Marketplace</button></li>
-    <li><button id="navTransfer">Transfer</button></li>
-    <li><button id="logoutBtn">Logout</button></li>
-  </ul>
+<div class="logo">BarterCoin</div>
+
+<div class="nav-buttons">
+<button id="navWallet">Wallet</button>
+<button id="navMarket">Marketplace</button>
+<button id="navTransfer">Transfer</button>
+<button id="logoutBtn">Logout</button>
+</div>
+
 </nav>
 
 
@@ -25,42 +27,55 @@
 
 <!-- LOGIN -->
 <div id="loginPage">
-  <h2>Login</h2>
-  <button id="loginBtn">Login with Google</button>
+<h2>Login</h2>
+<button id="loginBtn">Login with Google</button>
 </div>
 
 
 <!-- WALLET -->
 <div id="walletPage" class="page">
-  <h2>Your Wallet</h2>
-  Balance: <span id="balance">0</span> BC
+
+<h2>Your Wallet</h2>
+
+<div class="walletBox">
+Balance: <span id="balance">0</span> BC
+</div>
+
 </div>
 
 
-<!-- MARKETPLACE -->
+<!-- MARKET -->
 <div id="marketPage" class="page">
 
 <h2>Marketplace</h2>
 
-<div class="postOffer">
+<div class="postBox">
+
 <input id="offerTitle" placeholder="Title">
+
 <input id="offerPrice" type="number" placeholder="Price">
+
 <textarea id="offerDesc" placeholder="Description"></textarea>
+
 <button id="postOfferBtn">Post Offer</button>
+
 </div>
 
 <h3>Offers</h3>
+
 <div id="offersList"></div>
 
 </div>
 
 
 <!-- TRANSFER -->
+
 <div id="transferPage" class="page">
 
 <h2>Transfer Coins</h2>
 
 <select id="userSelect"></select>
+
 <input id="transferAmount" type="number" placeholder="Amount">
 
 <button id="sendBtn">Send</button>
