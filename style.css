@@ -1,117 +1,86 @@
 body{
-font-family:Arial, sans-serif;
+font-family:Arial;
 margin:0;
-background:#f5f5f5;
-padding-bottom:70px;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-background:#222;
-color:white;
-padding:12px 16px;
-}
-
-.balance{
-font-weight:bold;
-}
-
-.section{
-padding:16px;
-}
-
-.center{
-display:flex;
-justify-content:center;
-align-items:center;
-height:80vh;
-}
-
-.bigBtn{
-padding:15px 25px;
-font-size:18px;
-}
-
-input,select,button{
-
-width:100%;
-padding:10px;
-margin-top:8px;
-margin-bottom:8px;
-border-radius:6px;
-border:1px solid #ccc;
-font-size:16px;
-
-}
-
-button{
-background:#2e7d32;
-color:white;
-border:none;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-.marketGrid{
-
-display:grid;
-grid-template-columns:1fr;
-gap:12px;
-
-}
-
-.card{
-
-background:white;
-padding:14px;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-
-}
-
-.cardTitle{
-font-size:18px;
-font-weight:bold;
-}
-
-.cardPrice{
-color:#2e7d32;
-font-weight:bold;
-margin-top:5px;
-}
-
-.buyBtn{
-margin-top:10px;
-background:#1976d2;
+background:#f4f6f8;
 }
 
 .navbar{
-
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-height:60px;
-
-background:white;
-border-top:1px solid #ddd;
-
 display:flex;
-justify-content:space-around;
+justify-content:space-between;
 align-items:center;
-
-font-size:22px;
-
+background:#1f2937;
+padding:10px 20px;
+color:white;
 }
 
-@media(min-width:700px){
+.logo{
+font-size:20px;
+font-weight:bold;
+}
 
-.marketGrid{
-grid-template-columns:1fr 1fr;
+.nav-links{
+list-style:none;
+display:flex;
+gap:10px;
+padding:0;
+margin:0;
+}
+
+.nav-links button{
+background:#374151;
+border:none;
+color:white;
+padding:8px 12px;
+cursor:pointer;
+border-radius:6px;
+}
+
+.nav-links button:hover{
+background:#4b5563;
+}
+
+.container{
+padding:20px;
+max-width:800px;
+margin:auto;
+}
+
+.page{
+display:none;
+}
+
+input, textarea, select{
+width:100%;
+padding:8px;
+margin:6px 0;
+box-sizing:border-box;
+}
+
+button{
+padding:8px 12px;
+cursor:pointer;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:6px;
+}
+
+button:hover{
+background:#1e40af;
+}
+
+.offer{
+background:white;
+padding:10px;
+margin:10px 0;
+border-radius:6px;
+box-shadow:0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media(max-width:600px){
+
+.nav-links{
+flex-wrap:wrap;
 }
 
 }

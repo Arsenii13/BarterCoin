@@ -1,204 +1,232 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getAuth,
-GoogleAuthProvider,
-signInWithPopup,
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-getFirestore,
-doc,
-getDoc,
-setDoc,
-updateDoc,
-collection,
-addDoc,
-getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-
 apiKey: "AIzaSyAqVEpAQ8sT15lLoWzJe0jmFGE3jsU_BTQ",
 authDomain: "bartercoin-3fc73.firebaseapp.com",
 projectId: "bartercoin-3fc73",
 storageBucket: "bartercoin-3fc73.appspot.com",
 messagingSenderId: "1047699487399",
 appId: "1:1047699487399:web:a54c50ac062f857a923982"
-
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const provider = new GoogleAuthProvider();
+let currentUser=null;
 
+const loginBtn=document.getElementById("loginBtn");
+const logoutBtn=document.getElementById("logoutBtn");
 
+const walletPage=document.getElementById("walletPage");
+const marketPage=document.getElementById("marketPage");
+const transferPage=document.getElementById("transferPage");
 
-document.getElementById("googleLogin").onclick=()=>{
+const loginPage=document.getElementById("loginPage");
 
-signInWithPopup(auth,provider);
+const balanceEl=document.getElementById("balance");
 
-};
+const navWallet=document.getElementById("navWallet");
+const navMarket=document.getElementById("navMarket");
+const navTransfer=document.getElementById("navTransfer");
 
+function showPage(page){
 
+walletPage.style.display="none";
+marketPage.style.display="none";
+transferPage.style.display="none";
 
-onAuthStateChanged(auth,async(user)=>{
+page.style.display="block";
 
-if(!user)return;
+}
 
-document.getElementById("loginArea").style.display="none";
-document.getElementById("appArea").style.display="block";
+navWallet.onclick=()=>showPage(walletPage);
+navMarket.onclick=()=>showPage(marketPage);
+navTransfer.onclick=()=>showPage(transferPage);
+
+loginBtn.onclick=async()=>{
+
+const provider=new GoogleAuthProvider();
+const result=await signInWithPopup(auth,provider);
+
+const user=result.user;
 
 const userRef=doc(db,"users",user.uid);
-
 const snap=await getDoc(userRef);
 
 if(!snap.exists()){
-
 await setDoc(userRef,{
 name:user.displayName,
-balance:20
+balance:100
+});
+}
+
+};
+
+logoutBtn.onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async(user)=>{
+
+if(user){
+
+currentUser=user;
+
+loginPage.style.display="none";
+
+await loadBalance();
+
+await loadUsers();
+
+await loadOffers();
+
+showPage(walletPage);
+
+}else{
+
+loginPage.style.display="block";
+
+}
+
+});
+
+async function loadBalance(){
+
+const snap=await getDoc(doc(db,"users",currentUser.uid));
+
+balanceEl.textContent=snap.data().balance;
+
+}
+
+document.getElementById("postOfferBtn").onclick=async()=>{
+
+const title=document.getElementById("offerTitle").value;
+const price=parseInt(document.getElementById("offerPrice").value);
+const desc=document.getElementById("offerDesc").value;
+
+await addDoc(collection(db,"offers"),{
+
+title,
+price,
+desc,
+seller:currentUser.uid
+
+});
+
+loadOffers();
+
+};
+
+async function loadOffers(){
+
+const offersList=document.getElementById("offersList");
+offersList.innerHTML="";
+
+const querySnap=await getDocs(collection(db,"offers"));
+
+querySnap.forEach(docu=>{
+
+const data=docu.data();
+
+const div=document.createElement("div");
+div.className="offer";
+
+div.innerHTML=`
+<h4>${data.title}</h4>
+<p>${data.desc}</p>
+Price: ${data.price} BC
+<br>
+<button data-id="${docu.id}">Buy</button>
+`;
+
+div.querySelector("button").onclick=()=>buyOffer(docu.id,data);
+
+offersList.appendChild(div);
+
 });
 
 }
 
-loadBalance(user.uid);
-loadUsers();
-loadMarketplace();
+async function buyOffer(id,data){
 
-});
-
-
-
-async function loadBalance(uid){
-
-const snap=await getDoc(doc(db,"users",uid));
-
-document.getElementById("balance").textContent=snap.data().balance;
-
+if(data.seller===currentUser.uid){
+alert("You can't buy your own offer");
+return;
 }
 
+const buyerRef=doc(db,"users",currentUser.uid);
+const sellerRef=doc(db,"users",data.seller);
 
+const buyerSnap=await getDoc(buyerRef);
+
+let buyerBal=buyerSnap.data().balance;
+
+if(buyerBal<data.price){
+alert("Not enough coins");
+return;
+}
+
+await updateDoc(buyerRef,{balance:buyerBal-data.price});
+
+const sellerSnap=await getDoc(sellerRef);
+let sellerBal=sellerSnap.data().balance;
+
+await updateDoc(sellerRef,{balance:sellerBal+data.price});
+
+loadBalance();
+
+alert("Purchase successful");
+
+}
 
 async function loadUsers(){
 
-const dropdown=document.getElementById("userDropdown");
+const select=document.getElementById("userSelect");
+select.innerHTML="";
 
-dropdown.innerHTML="";
+const querySnap=await getDocs(collection(db,"users"));
 
-const users=await getDocs(collection(db,"users"));
+querySnap.forEach(u=>{
 
-users.forEach(docSnap=>{
+if(u.id===currentUser.uid)return;
 
-if(docSnap.id===auth.currentUser.uid)return;
+const option=document.createElement("option");
 
-const opt=document.createElement("option");
+option.value=u.id;
+option.textContent=u.data().name;
 
-opt.value=docSnap.id;
-opt.textContent=docSnap.data().name;
-
-dropdown.appendChild(opt);
+select.appendChild(option);
 
 });
 
 }
 
+document.getElementById("sendBtn").onclick=async()=>{
 
+const uid=document.getElementById("userSelect").value;
+const amount=parseInt(document.getElementById("transferAmount").value);
 
-document.getElementById("sendCoins").onclick=async()=>{
+const myRef=doc(db,"users",currentUser.uid);
+const otherRef=doc(db,"users",uid);
 
-const sender=auth.currentUser.uid;
+const mySnap=await getDoc(myRef);
+let myBal=mySnap.data().balance;
 
-const receiver=document.getElementById("userDropdown").value;
-
-const amount=Number(document.getElementById("amount").value);
-
-if(amount<=0)return;
-
-const senderRef=doc(db,"users",sender);
-const receiverRef=doc(db,"users",receiver);
-
-const senderSnap=await getDoc(senderRef);
-
-const senderBalance=senderSnap.data().balance;
-
-if(senderBalance<amount){
-
+if(myBal<amount){
 alert("Not enough coins");
 return;
-
 }
 
-await updateDoc(senderRef,{balance:senderBalance-amount});
+await updateDoc(myRef,{balance:myBal-amount});
 
-const receiverSnap=await getDoc(receiverRef);
+const otherSnap=await getDoc(otherRef);
+let otherBal=otherSnap.data().balance;
 
-await updateDoc(receiverRef,{
-balance:receiverSnap.data().balance+amount
-});
+await updateDoc(otherRef,{balance:otherBal+amount});
 
-loadBalance(sender);
+loadBalance();
 
-};
-
-
-
-document.getElementById("createListing").onclick=async()=>{
-
-const name=document.getElementById("itemName").value;
-const price=Number(document.getElementById("price").value);
-
-if(!name||price<=0)return;
-
-await addDoc(collection(db,"listings"),{
-
-title:name,
-price:price,
-sellerUid:auth.currentUser.uid,
-status:"active"
-
-});
-
-loadMarketplace();
+alert("Transfer complete");
 
 };
-
-
-
-async function loadMarketplace(){
-
-const container=document.getElementById("marketplace");
-
-container.innerHTML="";
-
-const listings=await getDocs(collection(db,"listings"));
-
-listings.forEach(docSnap=>{
-
-const item=docSnap.data();
-
-if(item.status!=="active")return;
-
-const card=document.createElement("div");
-
-card.className="card";
-
-card.innerHTML=`
-
-<div class="cardTitle">${item.title}</div>
-
-<div class="cardPrice">${item.price} BC</div>
-
-<button class="buyBtn">BUY</button>
-
-`;
-
-container.appendChild(card);
-
-});
-
-}
