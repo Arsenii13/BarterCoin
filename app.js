@@ -22,14 +22,12 @@ runTransaction
 
 
 const firebaseConfig = {
-
-apiKey:"PASTE",
-authDomain:"PASTE",
-projectId:"PASTE",
-storageBucket:"PASTE",
-messagingSenderId:"PASTE",
-appId:"PASTE"
-
+apiKey: "AIzaSyAqVEpAQ8sT15lLoWzJe0jmFGE3jsU_BTQ",
+authDomain: "bartercoin-3fc73.firebaseapp.com",
+projectId: "bartercoin-3fc73",
+storageBucket: "bartercoin-3fc73.appspot.com",
+messagingSenderId: "1047699487399",
+appId: "1:1047699487399:web:a54c50ac062f857a923982"
 };
 
 const app=initializeApp(firebaseConfig);
