@@ -18,16 +18,16 @@ addDoc,
 getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-
 const firebaseConfig = {
+
 apiKey: "AIzaSyAqVEpAQ8sT15lLoWzJe0jmFGE3jsU_BTQ",
 authDomain: "bartercoin-3fc73.firebaseapp.com",
 projectId: "bartercoin-3fc73",
 storageBucket: "bartercoin-3fc73.appspot.com",
 messagingSenderId: "1047699487399",
 appId: "1:1047699487399:web:a54c50ac062f857a923982"
-};
 
+};
 
 const app = initializeApp(firebaseConfig);
 
@@ -38,28 +38,26 @@ const provider = new GoogleAuthProvider();
 
 
 
-document.getElementById("googleLogin").onclick = () => {
+document.getElementById("googleLogin").onclick=()=>{
 
-signInWithPopup(auth, provider);
+signInWithPopup(auth,provider);
 
 };
 
 
 
-onAuthStateChanged(auth, async (user)=>{
+onAuthStateChanged(auth,async(user)=>{
 
-if(!user) return;
+if(!user)return;
 
 document.getElementById("loginArea").style.display="none";
 document.getElementById("appArea").style.display="block";
 
-document.getElementById("username").textContent = user.displayName;
+const userRef=doc(db,"users",user.uid);
 
-const userRef = doc(db,"users",user.uid);
+const snap=await getDoc(userRef);
 
-const userSnap = await getDoc(userRef);
-
-if(!userSnap.exists()){
+if(!snap.exists()){
 
 await setDoc(userRef,{
 name:user.displayName,
@@ -78,11 +76,9 @@ loadMarketplace();
 
 async function loadBalance(uid){
 
-const ref = doc(db,"users",uid);
+const snap=await getDoc(doc(db,"users",uid));
 
-const snap = await getDoc(ref);
-
-document.getElementById("balance").textContent = snap.data().balance;
+document.getElementById("balance").textContent=snap.data().balance;
 
 }
 
@@ -90,24 +86,22 @@ document.getElementById("balance").textContent = snap.data().balance;
 
 async function loadUsers(){
 
-const dropdown = document.getElementById("userDropdown");
+const dropdown=document.getElementById("userDropdown");
 
 dropdown.innerHTML="";
 
-const query = await getDocs(collection(db,"users"));
+const users=await getDocs(collection(db,"users"));
 
-query.forEach(docSnap=>{
+users.forEach(docSnap=>{
 
-if(docSnap.id === auth.currentUser.uid) return;
+if(docSnap.id===auth.currentUser.uid)return;
 
-const data = docSnap.data();
+const opt=document.createElement("option");
 
-const option = document.createElement("option");
+opt.value=docSnap.id;
+opt.textContent=docSnap.data().name;
 
-option.value = docSnap.id;
-option.textContent = data.name;
-
-dropdown.appendChild(option);
+dropdown.appendChild(opt);
 
 });
 
@@ -115,40 +109,36 @@ dropdown.appendChild(option);
 
 
 
-document.getElementById("sendCoins").onclick = async ()=>{
+document.getElementById("sendCoins").onclick=async()=>{
 
-const sender = auth.currentUser.uid;
+const sender=auth.currentUser.uid;
 
-const receiver = document.getElementById("userDropdown").value;
+const receiver=document.getElementById("userDropdown").value;
 
-const amount = Number(document.getElementById("amount").value);
+const amount=Number(document.getElementById("amount").value);
 
-if(amount <=0) return;
+if(amount<=0)return;
 
+const senderRef=doc(db,"users",sender);
+const receiverRef=doc(db,"users",receiver);
 
+const senderSnap=await getDoc(senderRef);
 
-const senderRef = doc(db,"users",sender);
-const receiverRef = doc(db,"users",receiver);
+const senderBalance=senderSnap.data().balance;
 
-const senderSnap = await getDoc(senderRef);
-
-const senderBalance = senderSnap.data().balance;
-
-if(senderBalance < amount){
+if(senderBalance<amount){
 
 alert("Not enough coins");
 return;
 
 }
 
-await updateDoc(senderRef,{
-balance: senderBalance - amount
-});
+await updateDoc(senderRef,{balance:senderBalance-amount});
 
-const receiverSnap = await getDoc(receiverRef);
+const receiverSnap=await getDoc(receiverRef);
 
 await updateDoc(receiverRef,{
-balance: receiverSnap.data().balance + amount
+balance:receiverSnap.data().balance+amount
 });
 
 loadBalance(sender);
@@ -157,13 +147,12 @@ loadBalance(sender);
 
 
 
-document.getElementById("createListing").onclick = async ()=>{
+document.getElementById("createListing").onclick=async()=>{
 
-const name = document.getElementById("itemName").value;
+const name=document.getElementById("itemName").value;
+const price=Number(document.getElementById("price").value);
 
-const price = Number(document.getElementById("price").value);
-
-if(!name || price<=0) return;
+if(!name||price<=0)return;
 
 await addDoc(collection(db,"listings"),{
 
@@ -182,28 +171,33 @@ loadMarketplace();
 
 async function loadMarketplace(){
 
-const container = document.getElementById("marketplace");
+const container=document.getElementById("marketplace");
 
 container.innerHTML="";
 
-const query = await getDocs(collection(db,"listings"));
+const listings=await getDocs(collection(db,"listings"));
 
-query.forEach(docSnap=>{
+listings.forEach(docSnap=>{
 
-const item = docSnap.data();
+const item=docSnap.data();
 
-if(item.status !== "active") return;
+if(item.status!=="active")return;
 
-const div = document.createElement("div");
+const card=document.createElement("div");
 
-div.className="card";
+card.className="card";
 
-div.innerHTML = `
-<b>${item.title}</b><br>
-Price: ${item.price} BC
+card.innerHTML=`
+
+<div class="cardTitle">${item.title}</div>
+
+<div class="cardPrice">${item.price} BC</div>
+
+<button class="buyBtn">BUY</button>
+
 `;
 
-container.appendChild(div);
+container.appendChild(card);
 
 });
 

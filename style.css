@@ -1,70 +1,117 @@
-/* Reset */
-* {
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
+body{
+font-family:Arial, sans-serif;
+margin:0;
+background:#f5f5f5;
+padding-bottom:70px;
 }
 
-body {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#222;
+color:white;
+padding:12px 16px;
 }
 
-.container {
-    background: white;
-    width: 90%;
-    max-width: 500px;
-
-    padding: 25px;
-
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-
-    text-align: center;
+.balance{
+font-weight:bold;
 }
 
-h1 {
-    margin-top: 0;
+.section{
+padding:16px;
 }
 
-input, select, button {
-    width: 100%;
-    padding: 10px;
-
-    margin: 8px 0;
-
-    border-radius: 8px;
-    border: 1px solid #ccc;
-
-    font-size: 16px;
+.center{
+display:flex;
+justify-content:center;
+align-items:center;
+height:80vh;
 }
 
-button {
-    background: #4facfe;
-    color: white;
-    border: none;
-    cursor: pointer;
+.bigBtn{
+padding:15px 25px;
+font-size:18px;
 }
 
-button:hover {
-    background: #3288ff;
+input,select,button{
+
+width:100%;
+padding:10px;
+margin-top:8px;
+margin-bottom:8px;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:16px;
+
 }
 
-.result {
-    background: #f3f7fa;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 15px;
-
-    text-align: left;
-    white-space: pre-wrap;
+button{
+background:#2e7d32;
+color:white;
+border:none;
 }
 
-.graph {
-    margin-top: 20px;
+button:hover{
+opacity:0.9;
+}
+
+.marketGrid{
+
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+
+}
+
+.card{
+
+background:white;
+padding:14px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+
+}
+
+.cardTitle{
+font-size:18px;
+font-weight:bold;
+}
+
+.cardPrice{
+color:#2e7d32;
+font-weight:bold;
+margin-top:5px;
+}
+
+.buyBtn{
+margin-top:10px;
+background:#1976d2;
+}
+
+.navbar{
+
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:60px;
+
+background:white;
+border-top:1px solid #ddd;
+
+display:flex;
+justify-content:space-around;
+align-items:center;
+
+font-size:22px;
+
+}
+
+@media(min-width:700px){
+
+.marketGrid{
+grid-template-columns:1fr 1fr;
+}
+
 }

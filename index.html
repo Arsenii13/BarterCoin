@@ -3,54 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <title>BarterCoin</title>
+
+<link rel="stylesheet" href="style.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script type="module" src="app.js"></script>
-
-<style>
-
-body{
-font-family:Arial;
-max-width:700px;
-margin:auto;
-padding:20px;
-}
-
-button{
-padding:8px;
-margin:5px;
-}
-
-input,select{
-padding:6px;
-margin:5px;
-}
-
-.card{
-border:1px solid #ccc;
-padding:10px;
-margin-top:10px;
-border-radius:8px;
-}
-
-</style>
 
 </head>
 
 <body>
 
+<header class="topbar">
 <h1>BarterCoin</h1>
-
-<div id="loginArea">
-<button id="googleLogin">Login with Google</button>
+<div class="balance">
+<span id="balance">0</span> BC
 </div>
+</header>
+
+
+<div id="loginArea" class="center">
+
+<button id="googleLogin" class="bigBtn">
+Login with Google
+</button>
+
+</div>
+
 
 <div id="appArea" style="display:none">
 
-<h3 id="username"></h3>
-Balance: <b><span id="balance"></span> BC</b>
 
-<hr>
+<section class="section">
 
-<h3>Send Coins</h3>
+<h2>Send Coins</h2>
 
 <select id="userDropdown"></select>
 
@@ -58,22 +44,41 @@ Balance: <b><span id="balance"></span> BC</b>
 
 <button id="sendCoins">Send</button>
 
-<hr>
+</section>
 
-<h3>Create Listing</h3>
+
+<section class="section">
+
+<h2>Create Listing</h2>
 
 <input id="itemName" placeholder="Item name">
+
 <input id="price" type="number" placeholder="Price">
 
 <button id="createListing">Sell</button>
 
-<hr>
+</section>
 
-<h3>Marketplace</h3>
 
-<div id="marketplace"></div>
+<section class="section">
+
+<h2>Marketplace</h2>
+
+<div id="marketplace" class="marketGrid"></div>
+
+</section>
 
 </div>
+
+
+<nav class="navbar">
+
+<div>🏠</div>
+<div>💰</div>
+<div>➕</div>
+<div>👤</div>
+
+</nav>
 
 </body>
 </html>
