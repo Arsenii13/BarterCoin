@@ -5,16 +5,35 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<header class="nav">
+  <h2>BarterCoin</h2>
 
-<div class="container">
-  <h2>Your Wallet</h2>
-  <p id="balance"></p>
+  <nav>
+    <a href="index.html">Market</a>
+    <a href="sell.html">Sell</a>
+    <a href="wallet.html">Wallet</a>
+    <a href="chat.html">Chat</a>
+    <a href="profile.html">Profile</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+
+  <<div class="container">
+  <h2>Wallet</h2>
+
+  <h3>Send Money</h3>
+  <select id="users"></select>
+  <input id="amount" type="number" placeholder="Amount">
+  <button id="sendBtn">Send</button>
 </div>
 
 <script type="module">
-import { loadBalance } from "./js/wallet.js";
-loadBalance();
-</script>
+import { sendMoney, loadUsersDropdown } from "./js/wallet.js";
 
+loadUsersDropdown();
+
+sendBtn.onclick = () => {
+  sendMoney(users.value, Number(amount.value));
+};
+</script>
 </body>
 </html>

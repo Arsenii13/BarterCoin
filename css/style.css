@@ -5,24 +5,22 @@ body {
   color: white;
 }
 
-header {
+.nav {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  padding: 15px;
+  padding: 10px;
   background: #1e293b;
 }
 
-button {
-  padding: 8px 12px;
-  border: none;
-  background: #22c55e;
+nav a {
+  margin: 5px;
   color: white;
-  cursor: pointer;
-  border-radius: 5px;
+  text-decoration: none;
 }
 
 .container {
-  padding: 20px;
+  padding: 15px;
 }
 
 .card {
@@ -32,10 +30,25 @@ button {
   border-radius: 8px;
 }
 
-input, textarea {
+button {
+  padding: 8px;
+  background: #22c55e;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  width: 100%;
+  margin-top: 5px;
+}
+
+input, textarea, select {
   width: 100%;
   padding: 8px;
   margin: 5px 0;
-  border-radius: 5px;
-  border: none;
+}
+
+@media (min-width: 600px) {
+  .container {
+    max-width: 600px;
+    margin: auto;
+  }
 }
