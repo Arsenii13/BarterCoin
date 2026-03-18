@@ -1,12 +1,11 @@
 import { auth, db, login, onAuthStateChanged } from "./firebase.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import "./router.js";
 
 const loginBtn = document.getElementById("loginBtn");
 const balanceEl = document.getElementById("balance");
 
-loginBtn?.addEventListener("click", async () => {
-  await login();
-});
+loginBtn.onclick = login;
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
@@ -25,5 +24,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const data = (await getDoc(ref)).data();
-  if (balanceEl) balanceEl.innerText = `💰 ${data.balance} BC`;
+  balanceEl.innerText = `💰 ${data.balance} BC`;
+
+  navigate("market");
 });

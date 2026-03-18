@@ -1,6 +1,6 @@
 body {
-  font-family: Arial;
   margin: 0;
+  font-family: system-ui;
   background: #0f172a;
   color: white;
 }
@@ -10,13 +10,16 @@ body {
   flex-wrap: wrap;
   justify-content: space-between;
   padding: 10px;
-  background: #1e293b;
+  background: #020617;
 }
 
-nav a {
-  margin: 5px;
-  color: white;
-  text-decoration: none;
+button {
+  background: #22c55e;
+  border: none;
+  padding: 8px;
+  margin: 3px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .container {
@@ -26,24 +29,29 @@ nav a {
 .card {
   background: #1e293b;
   padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
+  margin: 10px 0;
+  border-radius: 10px;
+  transition: 0.2s;
 }
 
-button {
-  padding: 8px;
-  background: #22c55e;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  width: 100%;
-  margin-top: 5px;
+.card:hover {
+  transform: scale(1.02);
 }
 
 input, textarea, select {
   width: 100%;
-  padding: 8px;
   margin: 5px 0;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+#chatBox {
+  height: 300px;
+  overflow-y: auto;
+  background: #020617;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 @media (min-width: 600px) {

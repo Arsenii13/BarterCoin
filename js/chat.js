@@ -3,26 +3,29 @@ import {
   collection, addDoc, onSnapshot, query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-export function initChat() {
-  const input = document.getElementById("msg");
-  const box = document.getElementById("chatBox");
+export function renderChat(app) {
+  app.innerHTML = `
+    <h2>Chat</h2>
+    <div id="chatBox"></div>
+    <input id="msg">
+    <button id="send">Send</button>
+  `;
 
-  document.getElementById("send").onclick = async () => {
+  send.onclick = async () => {
     await addDoc(collection(db, "messages"), {
-      text: input.value,
+      text: msg.value,
       user: auth.currentUser.displayName,
       createdAt: Date.now()
     });
-    input.value = "";
   };
 
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
-  onSnapshot(q, snapshot => {
-    box.innerHTML = "";
-    snapshot.forEach(doc => {
+  onSnapshot(q, snap => {
+    chatBox.innerHTML = "";
+    snap.forEach(doc => {
       const d = doc.data();
-      box.innerHTML += `<p><b>${d.user}:</b> ${d.text}</p>`;
+      chatBox.innerHTML += `<p><b>${d.user}:</b> ${d.text}</p>`;
     });
   });
 }

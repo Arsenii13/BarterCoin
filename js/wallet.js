@@ -1,83 +1,62 @@
 import { db, auth } from "./firebase.js";
 import {
-  doc, getDoc, updateDoc, addDoc, collection, getDocs
+  doc, getDoc, updateDoc, getDocs, collection
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// BUY WITH LOCK
+export async function renderWallet(app) {
+  app.innerHTML = `
+    <h2>Wallet</h2>
+    <select id="users"></select>
+    <input id="amount" type="number">
+    <button id="send">Send</button>
+  `;
+
+  const users = await getDocs(collection(db, "users"));
+
+  users.forEach(u => {
+    if (u.id === auth.currentUser.uid) return;
+    usersSelect.innerHTML += `<option value="${u.id}">${u.data().name}</option>`;
+  });
+
+  send.onclick = async () => {
+    const amountVal = Number(amount.value);
+
+    const fromRef = doc(db, "users", auth.currentUser.uid);
+    const toRef = doc(db, "users", usersSelect.value);
+
+    const from = (await getDoc(fromRef)).data();
+    const to = (await getDoc(toRef)).data();
+
+    if (from.balance < amountVal) return alert("Not enough");
+
+    await updateDoc(fromRef, {
+      balance: from.balance - amountVal
+    });
+
+    await updateDoc(toRef, {
+      balance: to.balance + amountVal * 0.85
+    });
+
+    alert("Sent!");
+  };
+}
+
 export async function buy(listingId, price, sellerId) {
-  const user = auth.currentUser;
-  if (!user) return alert("Login first");
+  const buyerRef = doc(db, "users", auth.currentUser.uid);
+  const buyer = (await getDoc(buyerRef)).data();
 
-  const buyerRef = doc(db, "users", user.uid);
-  const buyerSnap = await getDoc(buyerRef);
-
-  if (buyerSnap.data().balance < price) {
-    return alert("Not enough funds");
-  }
-
-  // Prevent double click
-  if (window.buying) return;
-  window.buying = true;
+  if (buyer.balance < price) return alert("Not enough");
 
   await updateDoc(buyerRef, {
-    balance: buyerSnap.data().balance - price
+    balance: buyer.balance - price
   });
 
-  const txRef = await addDoc(collection(db, "transactions"), {
-    buyerId: user.uid,
-    sellerId,
-    listingId,
-    amount: price,
-    status: "pending",
-    createdAt: Date.now()
+  const sellerRef = doc(db, "users", sellerId);
+  const seller = (await getDoc(sellerRef)).data();
+
+  await updateDoc(sellerRef, {
+    balance: seller.balance + price * 0.9
   });
 
-  await addDoc(collection(db, "escrow"), {
-    transactionId: txRef.id,
-    amount: price
-  });
-
-  alert("In escrow. Wait for delivery.");
-
-  window.buying = false;
-}
-
-// DIRECT TRANSFER
-export async function sendMoney(toUserId, amount) {
-  const user = auth.currentUser;
-
-  const fromRef = doc(db, "users", user.uid);
-  const toRef = doc(db, "users", toUserId);
-
-  const fromSnap = await getDoc(fromRef);
-  const toSnap = await getDoc(toRef);
-
-  if (fromSnap.data().balance < amount) {
-    return alert("Not enough");
-  }
-
-  const taxed = amount * 0.85;
-
-  await updateDoc(fromRef, {
-    balance: fromSnap.data().balance - amount
-  });
-
-  await updateDoc(toRef, {
-    balance: toSnap.data().balance + taxed
-  });
-
-  alert("Sent!");
-}
-
-// LOAD USERS DROPDOWN
-export async function loadUsersDropdown() {
-  const snapshot = await getDocs(collection(db, "users"));
-  const select = document.getElementById("users");
-
-  snapshot.forEach(docSnap => {
-    const option = document.createElement("option");
-    option.value = docSnap.id;
-    option.text = docSnap.data().name;
-    select.appendChild(option);
-  });
+  alert("Bought!");
 }

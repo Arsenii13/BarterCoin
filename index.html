@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>BarterCoin Marketplace</title>
+  <title>BarterCoin</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <header class="nav">
   <h2>BarterCoin</h2>
 
   <nav>
-    <a href="index.html">Market</a>
-    <a href="sell.html">Sell</a>
-    <a href="wallet.html">Wallet</a>
-    <a href="chat.html">Chat</a>
-    <a href="profile.html">Profile</a>
-    <a href="admin.html">Admin</a>
+    <button onclick="navigate('market')">Market</button>
+    <button onclick="navigate('sell')">Sell</button>
+    <button onclick="navigate('wallet')">Wallet</button>
+    <button onclick="navigate('chat')">Chat</button>
+    <button onclick="navigate('profile')">Profile</button>
+    <button onclick="navigate('admin')">Admin</button>
   </nav>
 
   <div>
@@ -22,25 +23,9 @@
     <button id="loginBtn">Login</button>
   </div>
 </header>
-<header>
-  <h2>BarterCoin</h2>
-  <div>
-    <button id="loginBtn">Login</button>
-    <span id="balance"></span>
-  </div>
-</header>
 
-<div class="container">
-  <h3>Marketplace</h3>
-  <div id="listings"></div>
-</div>
+<div id="app" class="container"></div>
 
-<script type="module">
-import "./js/app.js";
-import { loadListings } from "./js/marketplace.js";
-
-loadListings();
-</script>
-
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
