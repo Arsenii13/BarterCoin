@@ -1,38 +1,17 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>BarterCoin</title>
-  <link rel="stylesheet" href="css/style.css">
-  <meta http-equiv="Content-Security-Policy" content="
-default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
-connect-src *;
-img-src * data:;
-script-src * 'unsafe-inline' 'unsafe-eval';
-style-src * 'unsafe-inline';
-">
-</head>
-<body>
-
-<header class="nav">
-  <h2>BarterCoin</h2>
-
-  <nav>
-    <button onclick="navigate('market')">Market</button>
-    <button onclick="navigate('sell')">Sell</button>
-    <button onclick="navigate('wallet')">Wallet</button>
-    <button onclick="navigate('chat')">Chat</button>
-    <button onclick="navigate('profile')">Profile</button>
-    <button onclick="navigate('admin')">Admin</button>
-  </nav>
-
-  <div>
-    <span id="balance"></span>
-    <button id="loginBtn">Login</button>
-  </div>
-</header>
-
-<div id="app" class="container"></div>
-
-<script type="module" src="js/app.js"></script>
-</body>
-</html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BarterCoin</title>
+    <meta
+      name="description"
+      content="BarterCoin is a school-safe marketplace with internal campus tokens, escrow-backed trades, and student council moderation."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+  </html>
