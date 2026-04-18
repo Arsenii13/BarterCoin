@@ -26,7 +26,16 @@ After deployment, in Firebase Console:
 
 This version uses:
 - Firebase Authentication (Google + email/password)
-- Firestore for app state and marketplace data
+- Firestore collections:
+  - `profiles`
+  - `wallets`
+  - `listings`
+  - `orders`
+  - `messages`
+  - `disputes`
+  - `ledger`
+  - `notifications`
+  - `sanctions`
 - localStorage only for UI preferences
 
 Important:
@@ -38,13 +47,26 @@ Important:
 - Firebase email/password signup and login
 - Firebase Google sign-in
 - embedded admin bootstrap account (`admin@bartercoin.school`, password `090906`)
-- starter wallets
-- listing creation
+- starter wallets created on first login
+- listing creation with Firebase Storage upload
 - trusted-seller moderation bypass
-- escrow-backed purchase flow
+- escrow-backed purchase flow via Cloud Functions
 - order chat
-- dispute opening and council resolution
-- token rewards
-- trusted-seller toggling
-- audit log
-- reset/reseed shared Firestore data
+- dispute opening and council resolution with SLA timer
+- token rewards via Cloud Functions
+- admin moderation tools:
+  - bulk approve/reject
+  - sanctions (post/chat blocks)
+  - role claim assignment (admin/moderator/student)
+- marketplace search, price filters, category filters, sorting
+- mobile-friendly layout with animated transitions
+
+## Security + Functions deployment
+
+1. Publish rules:
+   - [firestore.rules](C:\Users\arsen\work\BarterCoin\web\firestore.rules)
+   - [storage.rules](C:\Users\arsen\work\BarterCoin\web\storage.rules)
+2. Deploy functions from:
+   - [firebase/functions/index.js](C:\Users\arsen\work\BarterCoin\firebase\functions\index.js)
+   - [firebase/functions/package.json](C:\Users\arsen\work\BarterCoin\firebase\functions\package.json)
+3. Ensure the first admin logs in and assigns custom claims using the Admin panel.

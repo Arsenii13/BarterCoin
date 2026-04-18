@@ -1,8 +1,81 @@
-rules_version = '2';
+﻿rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /app_data/main {
-      allow read, write: if request.auth != null;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return request.auth.token.role;
+    }
+
+    function isAdmin() {
+      return signedIn() && (role() == 'admin' || request.auth.token.email == 'admin@bartercoin.school');
+    }
+
+    function isModerator() {
+      return signedIn() && (role() == 'moderator' || role() == 'admin');
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /profiles/{uid} {
+      allow read: if signedIn();
+      allow create: if isSelf(uid);
+      allow update: if isSelf(uid) || isModerator();
+      allow delete: if isAdmin();
+    }
+
+    match /wallets/{uid} {
+      allow read: if isSelf(uid) || isModerator();
+      allow create: if isSelf(uid);
+      allow update, delete: if false;
+    }
+
+    match /ledger/{entryId} {
+      allow read: if signedIn() && (resource.data.ownerId == request.auth.uid || isModerator());
+      allow create: if signedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /listings/{listingId} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update: if signedIn() && (resource.data.sellerId == request.auth.uid || isModerator());
+      allow delete: if signedIn() && (resource.data.sellerId == request.auth.uid || isModerator());
+    }
+
+    match /orders/{orderId} {
+      allow read: if signedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isModerator());
+      allow create, delete: if false;
+      allow update: if signedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isModerator());
+    }
+
+    match /messages/{messageId} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update, delete: if false;
+    }
+
+    match /disputes/{disputeId} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update: if isModerator();
+      allow delete: if false;
+    }
+
+    match /notifications/{id} {
+      allow read: if signedIn() && resource.data.recipientId == request.auth.uid;
+      allow create: if (signedIn() && request.resource.data.recipientId == request.auth.uid) || isModerator() || isAdmin();
+      allow update: if isModerator() || isAdmin();
+      allow delete: if isModerator() || isAdmin();
+    }
+
+    match /sanctions/{uid} {
+      allow read: if isSelf(uid) || isModerator();
+      allow create, update, delete: if isModerator();
     }
   }
 }
