@@ -1,6 +1,5 @@
 ﻿
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-import { getAnalytics, isSupported as analyticsSupported } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -42,9 +41,6 @@ const ADMIN_PASSWORD = "090906";
 const STARTER_BALANCE = 500;
 
 const firebaseApp = initializeApp(config);
-analyticsSupported().then((ok) => {
-  if (ok) getAnalytics(firebaseApp);
-});
 
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
@@ -147,18 +143,49 @@ function resetData() {
 
 async function loadAllData() {
   const uid = auth.currentUser?.uid;
+  if (!uid) {
+    resetData();
+    return;
+  }
+
+  const tokenResult = await auth.currentUser.getIdTokenResult();
+  const tokenRole = tokenResult.claims.role || ((auth.currentUser.email || "").toLowerCase() === ADMIN_EMAIL ? "admin" : "student");
+  const canReadAll = tokenRole === "admin" || tokenRole === "moderator";
+
+  const profilesPromise = loadCollection(query(collection(db, "profiles"), orderBy("updatedAt", "desc"), limit(300)));
+  const listingsPromise = loadCollection(query(collection(db, "listings"), orderBy("createdAt", "desc"), limit(500)));
+  const messagesPromise = loadCollection(query(collection(db, "messages"), orderBy("createdAt", "desc"), limit(1000)));
+  const disputesPromise = loadCollection(query(collection(db, "disputes"), orderBy("createdAt", "desc"), limit(500)));
+  const notificationsPromise = loadCollection(
+    query(collection(db, "notifications"), where("recipientId", "==", uid), orderBy("createdAt", "desc"), limit(150))
+  );
+
+  const walletsPromise = canReadAll
+    ? loadCollection(query(collection(db, "wallets"), orderBy("updatedAt", "desc"), limit(300)))
+    : loadSingleDocAsArray("wallets", uid);
+
+  const ledgerPromise = canReadAll
+    ? loadCollection(query(collection(db, "ledger"), orderBy("createdAt", "desc"), limit(1000)))
+    : loadCollection(query(collection(db, "ledger"), where("ownerId", "==", uid), orderBy("createdAt", "desc"), limit(400)));
+
+  const sanctionsPromise = canReadAll
+    ? loadCollection(query(collection(db, "sanctions"), orderBy("updatedAt", "desc"), limit(300)))
+    : loadSingleDocAsArray("sanctions", uid);
+
+  const ordersPromise = canReadAll
+    ? loadCollection(query(collection(db, "orders"), orderBy("updatedAt", "desc"), limit(500)))
+    : loadUserOrders(uid);
+
   const [profiles, wallets, listings, orders, messages, disputes, ledger, sanctions, notifications] = await Promise.all([
-    loadCollection(query(collection(db, "profiles"), orderBy("updatedAt", "desc"), limit(300))),
-    loadCollection(query(collection(db, "wallets"), orderBy("updatedAt", "desc"), limit(300))),
-    loadCollection(query(collection(db, "listings"), orderBy("createdAt", "desc"), limit(500))),
-    loadCollection(query(collection(db, "orders"), orderBy("updatedAt", "desc"), limit(500))),
-    loadCollection(query(collection(db, "messages"), orderBy("createdAt", "desc"), limit(1000))),
-    loadCollection(query(collection(db, "disputes"), orderBy("createdAt", "desc"), limit(500))),
-    loadCollection(query(collection(db, "ledger"), orderBy("createdAt", "desc"), limit(1000))),
-    loadCollection(query(collection(db, "sanctions"), orderBy("updatedAt", "desc"), limit(300))),
-    uid
-      ? loadCollection(query(collection(db, "notifications"), where("recipientId", "==", uid), orderBy("createdAt", "desc"), limit(150)))
-      : Promise.resolve([])
+    profilesPromise,
+    walletsPromise,
+    listingsPromise,
+    ordersPromise,
+    messagesPromise,
+    disputesPromise,
+    ledgerPromise,
+    sanctionsPromise,
+    notificationsPromise
   ]);
 
   state.profiles = profiles;
@@ -175,6 +202,25 @@ async function loadAllData() {
 async function loadCollection(q) {
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+async function loadSingleDocAsArray(collectionName, id) {
+  const snap = await getDoc(doc(db, collectionName, id));
+  if (!snap.exists()) return [];
+  return [{ id: snap.id, ...snap.data() }];
+}
+
+async function loadUserOrders(uid) {
+  const [asBuyer, asSeller] = await Promise.all([
+    loadCollection(query(collection(db, "orders"), where("buyerId", "==", uid), orderBy("updatedAt", "desc"), limit(250))),
+    loadCollection(query(collection(db, "orders"), where("sellerId", "==", uid), orderBy("updatedAt", "desc"), limit(250)))
+  ]);
+
+  const map = new Map();
+  for (const order of [...asBuyer, ...asSeller]) {
+    map.set(order.id, order);
+  }
+  return [...map.values()].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
 }
 
 function getMyProfile() {
