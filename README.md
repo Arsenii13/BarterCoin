@@ -37,6 +37,7 @@ This version uses:
   - `notifications`
   - `sanctions`
 - localStorage only for UI preferences
+- multilingual UI: English, Bulgarian, Ukrainian
 
 Important:
 - Opening directly via `file://` can block Firebase auth flows due browser/provider restrictions.
@@ -48,7 +49,7 @@ Important:
 - Firebase Google sign-in
 - embedded admin bootstrap account (`admin@bartercoin.school`, password `090906`)
 - starter wallets created on first login
-- listing creation with Firebase Storage upload
+- listing creation with generated design images (SVG, no faces)
 - trusted-seller moderation bypass
 - escrow-backed purchase flow via Cloud Functions
 - order chat
@@ -65,7 +66,6 @@ Important:
 
 1. Publish rules:
    - [firestore.rules](C:\Users\arsen\work\BarterCoin\web\firestore.rules)
-   - [storage.rules](C:\Users\arsen\work\BarterCoin\web\storage.rules)
 2. Deploy functions from:
    - [firebase/functions/index.js](C:\Users\arsen\work\BarterCoin\firebase\functions\index.js)
    - [firebase/functions/package.json](C:\Users\arsen\work\BarterCoin\firebase\functions\package.json)

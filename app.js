@@ -25,7 +25,6 @@ import {
   updateDoc,
   where
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-storage.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js";
 
 const config = {
@@ -49,7 +48,6 @@ analyticsSupported().then((ok) => {
 
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
-const storage = getStorage(firebaseApp);
 const functions = getFunctions(firebaseApp);
 const provider = new GoogleAuthProvider();
 
@@ -69,6 +67,7 @@ const state = {
     info: "",
     error: "",
     loading: true,
+    lang: localStorage.getItem("bc-lang") || "en",
     search: "",
     category: "all",
     sort: "newest",
@@ -256,19 +255,93 @@ function fmtDate(v) {
   const d = typeof v === "string" ? new Date(v) : new Date(v.seconds * 1000);
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(d);
 }
+
+function makeDesignImage(style, title) {
+  const safeTitle = String(title || "BarterCoin").replace(/[<>&'"]/g, "");
+  const presets = {
+    wave: { a: "#224d6a", b: "#56d7c1" },
+    grid: { a: "#3a2d64", b: "#7c9bff" },
+    blocks: { a: "#4a2f2f", b: "#f0a47c" },
+    badge: { a: "#224232", b: "#8fd98f" }
+  };
+  const palette = presets[style] || presets.wave;
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'>\n<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='${palette.a}'/><stop offset='100%' stop-color='${palette.b}'/></linearGradient></defs>\n<rect width='1200' height='800' fill='url(#g)'/>\n<g opacity='0.2'><circle cx='180' cy='160' r='110' fill='#fff'/><rect x='760' y='120' width='250' height='140' rx='24' fill='#fff'/><rect x='260' y='520' width='420' height='160' rx='28' fill='#fff'/></g>\n<text x='80' y='700' font-family='Segoe UI, Arial' font-size='58' fill='white'>${safeTitle}</text>\n<text x='82' y='748' font-family='Segoe UI, Arial' font-size='28' fill='rgba(255,255,255,0.86)'>BarterCoin Design</text>\n</svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+const I18N = {
+  bg: {
+    "Sign in": "Вход",
+    "Create account": "Създай профил",
+    "Need account": "Нямаш профил",
+    "Have account": "Имаш профил",
+    "Access your wallet": "Достъп до портфейла",
+    "Join marketplace": "Включи се в пазара",
+    "Continue with Google": "Продължи с Google",
+    "Workspace": "Работно табло",
+    "Marketplace": "Пазар",
+    "Create listing": "Създай обява",
+    "Orders": "Поръчки",
+    "Notifications": "Известия",
+    "Admin tools": "Админ инструменти",
+    "Browse items": "Разгледай обяви",
+    "New listing": "Нова обява",
+    "Apply filters": "Приложи филтри",
+    "Clear": "Изчисти",
+    "Buy with escrow": "Купи с ескроу",
+    "Report": "Докладвай",
+    "No listings found.": "Няма намерени обяви.",
+    "No notifications yet.": "Все още няма известия."
+  },
+  uk: {
+    "Sign in": "Увійти",
+    "Create account": "Створити акаунт",
+    "Need account": "Немає акаунта",
+    "Have account": "Вже є акаунт",
+    "Access your wallet": "Доступ до гаманця",
+    "Join marketplace": "Приєднатися до маркетплейсу",
+    "Continue with Google": "Продовжити з Google",
+    "Workspace": "Робочий простір",
+    "Marketplace": "Маркетплейс",
+    "Create listing": "Створити оголошення",
+    "Orders": "Замовлення",
+    "Notifications": "Сповіщення",
+    "Admin tools": "Інструменти адміністратора",
+    "Browse items": "Переглянути товари",
+    "New listing": "Нове оголошення",
+    "Apply filters": "Застосувати фільтри",
+    "Clear": "Очистити",
+    "Buy with escrow": "Купити через ескроу",
+    "Report": "Поскаржитися",
+    "No listings found.": "Оголошення не знайдено.",
+    "No notifications yet.": "Сповіщень поки немає."
+  }
+};
+
+function localize(html) {
+  const lang = state.ui.lang;
+  if (lang === "en") return html;
+  const dict = I18N[lang] || {};
+  let out = html;
+  for (const [from, to] of Object.entries(dict)) {
+    out = out.split(from).join(to);
+  }
+  return out;
+}
 function render() {
   if (state.ui.loading) {
-    app.innerHTML = `<div class="auth-wrap"><div class="auth-card"><div class="auth-brand"><div class="kicker">BarterCoin</div><h1 class="hero-title">Loading</h1><p class="sub">Syncing Firebase Auth and Firestore collections.</p></div><div class="auth-panel"><div class="note ok">Initializing...</div></div></div></div>`;
+    app.innerHTML = localize(`<div class="auth-wrap"><div class="auth-card"><div class="auth-brand"><div class="kicker">BarterCoin</div><h1 class="hero-title">Loading</h1><p class="sub">Syncing Firebase Auth and Firestore collections.</p></div><div class="auth-panel"><div class="note ok">Initializing...</div></div></div></div>`);
     return;
   }
 
   if (!state.me) {
-    app.innerHTML = renderAuth();
+    app.innerHTML = localize(renderAuth());
     bindAuth();
     return;
   }
 
-  app.innerHTML = renderShell();
+  app.innerHTML = localize(renderShell());
   bindApp();
 }
 
@@ -279,7 +352,7 @@ function renderAuth() {
         <section class="auth-brand">
           <span class="kicker">Firebase edition</span>
           <h1 class="hero-title">BarterCoin</h1>
-          <p class="sub">Google/email auth, Firestore collections, Storage uploads, and callable escrow logic.</p>
+          <p class="sub">Google/email auth, Firestore collections, design-image listings, and callable escrow logic.</p>
           <div class="box">
             <div><strong>Admin login</strong></div>
             <div class="hint">Name/email: admin or ${ADMIN_EMAIL}</div>
@@ -287,6 +360,11 @@ function renderAuth() {
           </div>
         </section>
         <section class="auth-panel">
+          <div class="wrap">
+            <button class="btn soft" type="button" data-lang="en">English</button>
+            <button class="btn soft" type="button" data-lang="bg">Български</button>
+            <button class="btn soft" type="button" data-lang="uk">Українська</button>
+          </div>
           <div class="row">
             <div>
               <div class="kicker">${state.ui.authMode === "signin" ? "Sign in" : "Create account"}</div>
@@ -361,6 +439,11 @@ function renderShell() {
           <span class="kicker">Live Firebase</span>
           <h1>BarterCoin</h1>
           <div class="sub">Escrow logic, role checks, collections, and moderation tooling.</div>
+        </div>
+        <div class="wrap">
+          <button class="btn soft" data-lang="en">EN</button>
+          <button class="btn soft" data-lang="bg">BG</button>
+          <button class="btn soft" data-lang="uk">UA</button>
         </div>
 
         <nav class="nav">
@@ -559,7 +642,7 @@ function renderCreate() {
     <header class="head">
       <div>
         <div class="kicker">Create listing</div>
-        <h2>Upload real item images to Firebase Storage and publish to Firestore.</h2>
+        <h2>Create a clean listing with built-in design images and publish to Firestore.</h2>
       </div>
     </header>
 
@@ -582,8 +665,13 @@ function renderCreate() {
       <label>Tags (comma)
         <input name="tags" placeholder="math, notebook, grade10" />
       </label>
-      <label>Image file (optional)
-        <input name="image" type="file" accept="image/*" />
+      <label>Design image
+        <select name="design">
+          <option value="wave">Wave</option>
+          <option value="grid">Grid</option>
+          <option value="blocks">Blocks</option>
+          <option value="badge">Badge</option>
+        </select>
       </label>
       <div class="full wrap">
         <button class="btn primary" type="submit">Publish listing</button>
@@ -794,6 +882,7 @@ function renderCouncil() {
 }
 
 function bindAuth() {
+  bindLanguageSwitcher();
   document.querySelector("[data-action='toggle-auth']")?.addEventListener("click", () => {
     state.ui.authMode = state.ui.authMode === "signin" ? "signup" : "signin";
     state.ui.info = "";
@@ -856,6 +945,7 @@ function bindAuth() {
   });
 }
 function bindApp() {
+  bindLanguageSwitcher();
   document.querySelectorAll("[data-view]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.ui.view = btn.getAttribute("data-view");
@@ -902,18 +992,10 @@ function bindApp() {
     }
 
     const fd = new FormData(event.currentTarget);
-    const imageFile = fd.get("image");
-    let imageUrl = "";
-
     try {
-      if (imageFile && imageFile.size > 0) {
-        const path = `listingImages/${state.me.uid}/${Date.now()}-${imageFile.name.replace(/\s+/g, "-")}`;
-        const storageRef = ref(storage, path);
-        await uploadBytes(storageRef, imageFile, { contentType: imageFile.type || "image/jpeg" });
-        imageUrl = await getDownloadURL(storageRef);
-      }
-
       const profile = getMyProfile();
+      const design = String(fd.get("design") || "wave");
+      const imageUrl = makeDesignImage(design, String(fd.get("title") || ""));
       const listingDoc = {
         sellerId: state.me.uid,
         title: String(fd.get("title") || "").trim(),
@@ -1179,6 +1261,18 @@ function bindApp() {
       render();
     });
   }
+}
+
+function bindLanguageSwitcher() {
+  document.querySelectorAll("[data-lang]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      if (!lang) return;
+      state.ui.lang = lang;
+      localStorage.setItem("bc-lang", lang);
+      render();
+    });
+  });
 }
 
 async function ensureProfile(user, override = null) {
